@@ -20,6 +20,7 @@ public abstract class AbstractController {
     protected <T>ResponseEntity<ResponseObject> sendResponse(T response , HttpStatus httpStatus) {
         ResponseObject responseBody = new ResponseObject();
         responseBody.setData(response);
+        responseBody.setStatus(HttpStatus.valueOf(httpStatus.value()));
         return new ResponseEntity<>(responseBody, httpStatus);
     }
 

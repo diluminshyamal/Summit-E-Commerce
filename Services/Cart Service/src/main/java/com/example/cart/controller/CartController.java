@@ -3,11 +3,11 @@ package com.example.cart.controller;
 import com.example.cart.dto.CartDto;
 import com.example.cart.dto.CartItemDto;
 import com.example.cart.dto.responses.ResponseObject;
-import com.example.cart.exception.CartNotFoundException; // Create custom exceptions
+import com.example.cart.exception.CartException;
 import com.example.cart.service.CartService;
 import jakarta.validation.Valid;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -22,9 +22,8 @@ public class CartController extends AbstractController {
 
     private final CartService cartService;
 
-
     @PostMapping("/")
-    public ResponseEntity<ResponseObject> createCart(@RequestBody CartDto createCartRequestBody) {
+    public ResponseEntity<ResponseObject> createCart(@Valid @RequestBody CartDto createCartRequestBody) {
         CartDto cart = cartService.createCart(createCartRequestBody);
         return sendCreatedResponse(cart);
     }
@@ -33,6 +32,7 @@ public class CartController extends AbstractController {
     public ResponseEntity<ResponseObject> addItemToCart(
             @PathVariable Long cartId,
             @Valid @RequestBody CartItemDto cartItemDto) {
+
         CartDto updatedCart = cartService.addItemToCart(cartId, cartItemDto);
         return sendSuccessResponse(updatedCart);
     }
@@ -66,18 +66,5 @@ public class CartController extends AbstractController {
         return sendSuccessResponse(cartItems);
     }
 
-    @ExceptionHandler(CartNotFoundException.class)
-    public ResponseEntity<ResponseObject> handleCartNotFound(CartNotFoundException ex) {
-        return sendErrorResponse(ex, HttpStatus.NOT_FOUND); // Helper method (see below)
-    }
-
-
-    // Helper method for consistent error responses
-    private ResponseEntity<ResponseObject> sendErrorResponse(Exception ex, HttpStatus status) {
-        ResponseObject responseObject = new ResponseObject();
-        responseObject.setStatus(status.value());
-        responseObject.setData(ex.getMessage()); // Or a more detailed error object
-        return new ResponseEntity<>(responseObject, status);
-    }
 
 }

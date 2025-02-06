@@ -1,7 +1,7 @@
-package com.example.product.controller;
+package com.example.order.controller;
 
-import com.example.product.dto.responses.ResponseObject;
-import com.example.product.exception.ProductExceptions;
+import com.example.order.dto.responses.ResponseObject;
+import com.example.order.exception.OrderException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -37,19 +37,19 @@ public abstract class AbstractController {
     }
 
     @ResponseBody
-    @ExceptionHandler(value = ProductExceptions.class)
-    protected ResponseEntity<ResponseObject> handleProductException(ProductExceptions productExceptions) {
-        LOGGER.error("Exception Occurred",productExceptions);
+    @ExceptionHandler(value = OrderException.class)
+    protected ResponseEntity<ResponseObject> handleCardException(OrderException orderExceptions) {
+        LOGGER.error("Exception Occurred",orderExceptions);
 
         Map<String, Object> errorData = new HashMap<>();
-        errorData.put("message", productExceptions.getMessage());
-        errorData.put("errors", productExceptions.getErrors());
-        errorData.put("timestamp", productExceptions.getTimestamp());
+        errorData.put("message", orderExceptions.getMessage());
+        errorData.put("errors", orderExceptions.getErrors());
+        errorData.put("timestamp", orderExceptions.getTimestamp());
 
         ResponseObject responseBody = new ResponseObject();
         responseBody.setData(errorData);
-        responseBody.setStatus(productExceptions.getHttpStatusCode());
-        return new ResponseEntity<>(responseBody, productExceptions.getHttpStatusCode());
+        responseBody.setStatus(orderExceptions.getHttpStatusCode());
+        return new ResponseEntity<>(responseBody, orderExceptions.getHttpStatusCode());
     }
 
     @ResponseBody
