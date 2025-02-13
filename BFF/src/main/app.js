@@ -16,3 +16,5 @@ app.get("/", (req, res) => {
 app.listen(PORT, () => {
   console.log(`BFF Server is running on http://localhost:${PORT}`);
 });
+
+export default app;

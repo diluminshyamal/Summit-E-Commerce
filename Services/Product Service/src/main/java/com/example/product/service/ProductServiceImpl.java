@@ -59,7 +59,6 @@ public class ProductServiceImpl implements ProductService {
                 throw new ProductExceptions(HttpStatus.BAD_REQUEST, "Product with the name already exists.");
             }
 
-            // Update only the fields that are provided in the request body
             if (productDto.getName() != null) {
                 product.setName(productDto.getName());
             }
