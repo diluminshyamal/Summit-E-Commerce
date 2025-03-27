@@ -1,20 +1,22 @@
-const express = require("express");
-const axios = require("axios");
-const cors = require("cors");
-require("dotenv").config();
+import express from "express";
+import cors from "cors";
+import productRoutes from "../api/routes/v1/productRoutes.js";
+import orderRoutes from "../api/routes/v1/orderRoutes.js";
+import cartRoutes from "../api/routes/v1/cartRoute.js";
+import authRouter from "../api/routes/v1/authRoute.js";
 
 const app = express();
-const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
-app.use(cors()); 
+app.use(cors());
 
-app.get("/", (req, res) => {
-  res.send("BFF Server is running...");
+app.get("/health", (req, res) => {
+  res.send("BFF Server is healthy...");
 });
 
-app.listen(PORT, () => {
-  console.log(`BFF Server is running on http://localhost:${PORT}`);
-});
+app.use("/api/v1/auth", authRouter);
+app.use("/bff/api/v1", productRoutes.router);
+app.use("/bff/api/v1", orderRoutes.router);
+app.use("/bff/api/v1", cartRoutes.router);
 
 export default app;

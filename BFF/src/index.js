@@ -1,12 +1,10 @@
+import app from "./main/app.js";
+import dotenv from "dotenv";
 
-const app = require("./main/app");
-require("dotenv").config();
-
+dotenv.config();
 
 const PORT = process.env.PORT || 3000;
 
-
-
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
   console.log(`BFF Server is running on http://localhost:${PORT}`);
 });
