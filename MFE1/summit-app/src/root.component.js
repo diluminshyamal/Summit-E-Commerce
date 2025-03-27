@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Header from "./components/Header/Header";
 import AuthRoute from "./AuthRoute";
 import HomeScreen from "./screens/HomeScreen";
-import ProductsView from "./components/ProductsView";
+import ProductsView from "./components/ProductView";
 
 export default function App() {
   const userType = localStorage.getItem("userType");
