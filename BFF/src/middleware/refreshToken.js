@@ -4,10 +4,8 @@ import * as crypto from "crypto";
 
 export const jwtParser = (req, res, next) => {
   try {
-    // Check for Authorization header
     const authHeader = req.headers.authorization;
     if (!authHeader) {
-      // No token provided, continue to next middleware
       return next();
     }
 
@@ -19,13 +17,10 @@ export const jwtParser = (req, res, next) => {
     // Parse and decode the JWT
     const decoded = parseJwt(token);
 
-    // Attach decoded token to request object for use in route handlers
     req.decodedToken = decoded;
     next();
   } catch (error) {
     console.error("JWT parsing error:", error);
-    // Continue to next middleware even if parsing fails
-    // Protected routes can check if req.decodedToken exists
     next();
   }
 };
@@ -38,21 +33,16 @@ export const jwtParser = (req, res, next) => {
  */
 export function parseJwt(token) {
   try {
-    // JWT structure: header.payload.signature
-    // Split the token and get the payload (second part)
     const base64Url = token.split(".")[1];
 
     if (!base64Url) {
       throw new Error("Invalid token format");
     }
 
-    // Convert base64url to base64 by replacing characters
     const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
 
-    // Decode base64 to UTF-8 string
     const jsonPayload = Buffer.from(base64, "base64").toString("utf-8");
 
-    // Parse JSON string to object
     return JSON.parse(jsonPayload);
   } catch (error) {
     throw new Error(`Failed to parse JWT token: ${error.message}`);
@@ -73,7 +63,6 @@ function calculateSecretHash(clientId, clientSecret) {
     .digest("base64");
 }
 
-// Create the AWS Cognito service client
 const cognito = new AWS.CognitoIdentityServiceProvider({
   region: process.env.AWS_REGION,
 });
@@ -124,12 +113,8 @@ export async function refreshTokens(refreshToken) {
   }
 }
 
-/**
- * Express middleware to automatically refresh tokens when they're about to expire
- */
 export const autoRefreshTokenMiddleware = async (req, res, next) => {
   try {
-    // Check if we have a token and it's decoded
     if (!req.decodedToken) {
       return next();
     }
@@ -146,14 +131,11 @@ export const autoRefreshTokenMiddleware = async (req, res, next) => {
         req.cookies?.refreshToken || req.headers["x-refresh-token"];
 
       if (refreshToken) {
-        // Refresh the tokens
         const newTokens = await refreshTokens(refreshToken);
 
-        // Set the new tokens in response headers
         res.setHeader("x-access-token", newTokens.accessToken);
         res.setHeader("x-id-token", newTokens.idToken);
 
-        // Update cookie if using cookies
         if (req.cookies?.refreshToken) {
           res.cookie("accessToken", newTokens.accessToken, {
             httpOnly: true,
@@ -166,7 +148,6 @@ export const autoRefreshTokenMiddleware = async (req, res, next) => {
 
     next();
   } catch (error) {
-    // Just log the error and continue - token refresh is optional
     console.error("Token refresh error:", error);
     next();
   }
