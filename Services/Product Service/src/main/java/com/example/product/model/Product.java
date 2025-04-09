@@ -27,6 +27,8 @@ public class Product {
 
     private String description;
 
+    private String image;
+
     @NotNull(message = "Price is Required")
     private BigDecimal price;
 

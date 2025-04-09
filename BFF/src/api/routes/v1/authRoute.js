@@ -1,13 +1,60 @@
 import { Router } from "express";
-import * as authController from "../../controllers/v1/authController.js";
-import { jwtParser } from "../../../middleware/jwtParser.js";
-
 const router = Router();
 
-router.post("/login", authController.loginUser);
-router.post("/refresh", authController.refreshUserTokens);
-router.post("/logout", authController.logoutUser);
+import authService from "../../../services/authService.js";
 
-router.get("/status", jwtParser, authController.checkAuthStatus);
+router.post("/signup", async (req, res) => {
+  const {
+    username,
+    password,
+    email,
+    phone_number,
+    name,
+    address,
+    birthdate,
+    gender,
+    role,
+  } = req.body;
+
+  try {
+    const data = await authService.signUp(
+      username,
+      password,
+      email,
+      phone_number,
+      name,
+      address,
+      birthdate,
+      gender,
+      role
+    );
+
+    res.json({
+      message: "User created.",
+      data: data,
+    });
+  } catch (error) {
+    console.log(`Error during signup for  ${error.message}`);
+    res
+      .status(400)
+      .json({ message: "Error during signup", error: error.message });
+  }
+});
+
+router.post("/signin", async (req, res) => {
+  const { username, password } = req.body;
+  try {
+    const data = await authService.signIn(username, password, res); // Note the 'res' being passed here
+    res.json({
+      message: "Logged In.",
+      data: data,
+    });
+  } catch (error) {
+    console.log(`Error during signin for  ${error.message}`);
+    res
+      .status(400)
+      .json({ message: "Error during signin", error: error.message });
+  }
+});
 
 export default router;

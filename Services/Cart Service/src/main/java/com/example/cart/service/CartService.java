@@ -2,6 +2,7 @@ package com.example.cart.service;
 
 import com.example.cart.dto.CartDto;
 import com.example.cart.dto.CartItemDto;
+import com.example.cart.model.Cart;
 
 import java.util.List;
 
@@ -16,6 +17,11 @@ public interface CartService {
     CartDto removeItemFromCart(Long cartId, Long itemId);
 
     void clearCart(Long cartId);
+
+    List<CartDto> getAllCarts();
+
+    CartDto getCartByUserId(Long userId);
+
 
     List<CartItemDto> getAllItemsInCart(Long cartId);
 }

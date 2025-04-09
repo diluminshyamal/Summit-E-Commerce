@@ -1,92 +1,71 @@
-import CartService from "../../../services/cartService.js";
+import cartService from "../../../services/cartService.js";
 
-export const getCartItemsByUserId = async (req, res) => {
+const createCartIfNotExist = async (req, res) => {
   try {
-    const { userId } = req.params;
-    const cartItems = await CartService.getCartItemsByUserId(userId);
-    res.json(cartItems);
+    const { userId } = req.body;
+
+    if (!userId) {
+      return res.status(400).json({ message: "Missing required user ID" });
+    }
+
+    const cartItems = await cartService.getCartByUserId(userId);
+    if (
+      cartItems === null ||
+      cartItems?.status === "NOT_FOUND" ||
+      cartItems?.message === "Cart not found"
+    ) {
+      const newCart = await cartService.createCart(userId);
+      return res.status(201).json(newCart);
+    }
+
+    res.status(200).json({ message: "Cart already exists", cart: cartItems });
   } catch (error) {
-    console.error("Error fetching cart items:", error);
-    res.status(error.response?.status || 500).json({
-      message:
-        error.response?.data?.message ||
-        error.message ||
-        "Failed to fetch cart items",
-      details: error.response?.data?.details,
-    });
+    console.error("Error checking/creating cart:", error);
+    res.status(500).json({ message: "Internal server error" });
   }
 };
 
-export const addItemToCart = async (req, res) => {
+const getCartByCartId = async (req, res) => {
   try {
-    const { userId } = req.params;
-    const productData = req.body;
-    const addedItem = await CartService.addItemToCart(userId, productData);
-    res.status(201).json(addedItem);
+    const cartId = req.params.cartId;
+    const cart = await cartService.getCartByCartId(cartId);
+    if (!cart) {
+      return res.status(404).json({ message: "Cart not found" });
+    }
+
+    res.status(200).json(cart);
   } catch (error) {
-    console.error("Error adding item to cart:", error);
-    res.status(error.response?.status || 500).json({
-      message:
-        error.response?.data?.message ||
-        error.message ||
-        "Failed to add item to cart",
-      details: error.response?.data?.details,
-    });
+    console.error("Error getting cart by user ID:", error);
+    res.status(500).json({ message: "Internal server error" });
   }
 };
 
-export const updateCartItem = async (req, res) => {
+const updateCart = async (req, res) => {
   try {
-    const { userId, cartItemId } = req.params;
-    const productData = req.body;
-    const updatedItem = await CartService.updateCartItem(
-      userId,
-      cartItemId,
-      productData
-    );
-    res.json(updatedItem);
+    const cartId = req.params.cartId;
+    const cartData = req.body;
+    const updatedCart = await cartService.updateCart(cartId, cartData);
+    res.status(200).json(updatedCart);
   } catch (error) {
-    console.error("Error updating cart item:", error);
-    res.status(error.response?.status || 500).json({
-      message:
-        error.response?.data?.message ||
-        error.message ||
-        "Failed to update cart item",
-      details: error.response?.data?.details,
-    });
+    console.error("Error updating cart:", error);
+    res.status(500).json({ message: "Internal server error" });
   }
 };
 
-export const deleteCartItem = async (req, res) => {
+const deleteCart = async (req, res) => {
   try {
-    const { userId, cartItemId } = req.params;
-    await CartService.deleteCartItem(userId, cartItemId);
-    res.sendStatus(204);
+    const userId = req.params.userId;
+    await cartService.deleteCart(userId);
+    res.status(204).end();
   } catch (error) {
-    console.error("Error deleting cart item:", error);
-    res.status(error.response?.status || 500).json({
-      message:
-        error.response?.data?.message ||
-        error.message ||
-        "Failed to delete cart item",
-      details: error.response?.data?.details,
-    });
+    console.error("Error deleting cart:", error);
+    res.status(500).json({ message: "Internal server error" });
   }
 };
 
-export const clearCart = async (req, res) => {
-  try {
-    const { userId } = req.params;
-    await CartService.clearCart(userId);
-    res.sendStatus(204);
-  } catch (error) {
-    console.error("Error clearing cart:", error);
-    res.status(error.response?.status || 500).json({
-      message:
-        error.response?.data?.message ||
-        error.message ||
-        "Failed to clear cart",
-      details: error.response?.data?.details,
-    });
-  }
+export default {
+  createCartIfNotExist,
+  getCartByCartId,
+  updateCart,
+  deleteCart,
 };

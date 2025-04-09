@@ -1,5 +1,6 @@
 {
-"productServiceAPI":"http://localhost:8080",
-"orderServiceAPI": "http://localhost:8082",
-"cartServiceAPI" :"http://localhost:8082"
+  "productServiceAPI": "http://localhost:8080",
+  "orderServiceAPI": "http://localhost:8082",
+  "cartServiceAPI": "http://localhost:8081",
+  "userServiceAPI": "http://localhost:8095"
 }

@@ -28,6 +28,23 @@ public class CartController extends AbstractController {
         return sendCreatedResponse(cart);
     }
 
+    @GetMapping("/")
+    public List<CartDto> getAllCarts() {
+        return cartService.getAllCarts(); // Now it correctly expects List<CartDto>
+    }
+
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<ResponseObject> getCartByUserId(@PathVariable Long userId) {
+        CartDto cart = cartService.getCartByUserId(userId);
+
+        if (cart == null) {
+            return new ResponseEntity<>(new ResponseObject(), HttpStatus.NOT_FOUND);
+        }
+
+        return sendSuccessResponse(cart);
+    }
+
+
     @PostMapping("/{cartId}/items")
     public ResponseEntity<ResponseObject> addItemToCart(
             @PathVariable Long cartId,

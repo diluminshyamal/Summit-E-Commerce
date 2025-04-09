@@ -7,7 +7,7 @@ import { HttpStatusCode } from "axios";
 const createProduct = async (productData) => {
   try {
     const response = await productServiceApiInstance.request({
-      url: "/products",
+      url: "v1/api/products",
       method: generalConstants.HTTP_METHODS.POST,
       data: productData,
     });
@@ -23,12 +23,12 @@ const createProduct = async (productData) => {
   }
 };
 
-const getAllProducts = async (page = 0, size = 10) => {
+const getAllProducts = async (page = 0, size = 10, sort = "name,asc") => {
   try {
-    const params = { page, size };
+    const params = { page, size, sort };
 
     const response = await productServiceApiInstance.request({
-      url: "/products",
+      url: "/v1/api/products",
       method: generalConstants.HTTP_METHODS.GET,
       params,
     });

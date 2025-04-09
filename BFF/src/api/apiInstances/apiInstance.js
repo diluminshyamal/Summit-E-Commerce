@@ -7,11 +7,16 @@ export const productServiceApiInstance = axios.create({
 });
 
 export const cartServiceApiInstance = axios.create({
-  baseURL: `${config.cartServiceAPI}`,
+  baseURL: `${config.cartServiceAPI}/v1/api`,
   withCredentials: false,
 });
 
 export const orderServiceApiInstance = axios.create({
   baseURL: `${config.orderServiceAPI}`,
+  withCredentials: false,
+});
+
+export const userServiceApiInstance = axios.create({
+  baseURL: `${config.userServiceAPI}`,
   withCredentials: false,
 });

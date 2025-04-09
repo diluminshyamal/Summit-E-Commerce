@@ -34,6 +34,14 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
+    public CartDto getCartByUserId(Long userId) {
+        Cart cart = cartRepository.findByUserId(userId)
+                .orElseThrow(() -> new CartException(HttpStatus.NOT_FOUND, "Cart for the user not found"));
+
+        return modelMapper.map(cart, CartDto.class);
+    }
+
+    @Override
     @Transactional
     public CartDto addItemToCart(Long cartId, CartItemDto cartItemDto) {
         Cart cart = cartRepository.findById(cartId)
@@ -109,6 +117,15 @@ public class CartServiceImpl implements CartService {
 
         return modelMapper.map(cart, CartDto.class);
     }
+
+    @Override
+    public List<CartDto> getAllCarts() {
+        List<Cart> carts = cartRepository.findAll();
+        return carts.stream()
+                .map(cart -> modelMapper.map(cart, CartDto.class))
+                .collect(Collectors.toList());
+    }
+
 
     @Override
     @Transactional
