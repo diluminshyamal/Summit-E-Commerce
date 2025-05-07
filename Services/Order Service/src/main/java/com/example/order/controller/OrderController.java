@@ -2,8 +2,9 @@ package com.example.order.controller;
 
 import com.example.order.dto.OrderDto;
 import com.example.order.dto.responses.ResponseObject;
-import com.example.order.exception.OrderException;
+import com.example.order.dto.OrderItemDto;
 import com.example.order.service.OrderService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,47 +21,58 @@ public class OrderController extends AbstractController {
 
     private final OrderService orderService;
 
-    @PostMapping
-    public ResponseEntity<ResponseObject> createOrder(
-            @RequestParam String userId,
-            @RequestParam List<Long> cartItemIds) {
-        try {
-            OrderDto createdOrder = orderService.createOrder(userId, cartItemIds);
-            return sendCreatedResponse(createdOrder);
-        } catch (OrderException e) { // Catch OrderException directly
-            throw e; // Re-throw the OrderException
-        } catch (Exception e) {
-            throw new OrderException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to create order", e);
-        }
+    @PostMapping("/")
+    public ResponseEntity<ResponseObject> createOrder(@Valid @RequestBody OrderDto createOrderRequestBody) {
+        OrderDto order = orderService.createOrder(createOrderRequestBody);
+        return sendCreatedResponse(order);
     }
 
-    @GetMapping("/{orderId}")
-    public ResponseEntity<ResponseObject> getOrderById(@PathVariable Long orderId) {
-        OrderDto order = orderService.getOrderById(orderId);
-        return sendSuccessResponse(order);
-    }
-
-    @GetMapping("/user/{userId}")
-    public ResponseEntity<ResponseObject> getOrdersByUserId(@PathVariable String userId) { // userId is a String
-        List<OrderDto> orders = orderService.getOrdersByUserId(userId);
+    @GetMapping("/")
+    public ResponseEntity<ResponseObject> getAllOrders() {
+        List<OrderDto> orders = orderService.getAllOrders();
         return sendSuccessResponse(orders);
     }
 
-    @PutMapping("/{orderId}")
-    public ResponseEntity<ResponseObject> updateOrder(@PathVariable Long orderId, @RequestBody OrderDto orderDto) {
-        OrderDto updatedOrder = orderService.updateOrder(orderId, orderDto);
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<ResponseObject> getOrderByUserId(@PathVariable Long userId) {
+        List<OrderDto> order = orderService.getOrdersByUserId(userId);
+        return sendSuccessResponse(order);
+    }
+
+    @PostMapping("/{orderId}/items")
+    public ResponseEntity<ResponseObject> addItemToOrder(
+            @PathVariable Long orderId,
+            @Valid @RequestBody OrderItemDto orderItemDto) {
+        OrderDto updatedOrder = orderService.addItemToOrder(orderId, orderItemDto);
+        return sendSuccessResponse(updatedOrder);
+    }
+
+    @PutMapping("/{orderId}/items/{itemId}")
+    public ResponseEntity<ResponseObject> updateOrderItem(
+            @PathVariable Long orderId,
+            @PathVariable Long itemId,
+            @Valid @RequestBody OrderItemDto orderItemDto) {
+        OrderDto updatedOrder = orderService.updateOrderItem(orderId, itemId, orderItemDto);
+        return sendSuccessResponse(updatedOrder);
+    }
+
+    @DeleteMapping("/{orderId}/items/{itemId}")
+    public ResponseEntity<ResponseObject> removeItemFromOrder(
+            @PathVariable Long orderId,
+            @PathVariable Long itemId) {
+        OrderDto updatedOrder = orderService.removeItemFromOrder(orderId, itemId);
         return sendSuccessResponse(updatedOrder);
     }
 
     @DeleteMapping("/{orderId}")
-    public ResponseEntity<ResponseObject> deleteOrder(@PathVariable Long orderId) {
-        orderService.deleteOrder(orderId);
+    public ResponseEntity<ResponseObject> clearOrder(@PathVariable Long orderId) {
+        orderService.clearOrder(orderId);
         return sendNoContentResponse();
     }
 
-    @GetMapping
-    public ResponseEntity<ResponseObject> getAllOrders() {
-        List<OrderDto> orders = orderService.getAllOrders();
-        return sendSuccessResponse(orders);
+    @GetMapping("/{orderId}/items")
+    public ResponseEntity<ResponseObject> getAllItemsInOrder(@PathVariable Long orderId) {
+        List<OrderItemDto> orderItems = orderService.getAllItemsInOrder(orderId);
+        return sendSuccessResponse(orderItems);
     }
 }

@@ -1,96 +1,32 @@
-import { cartServiceApiInstance } from "../api/apiInstances/apiInstance.js"; // Import the axios instance
+import logger from "../shared/loggerUtils.js";
+import generalConstants from "../constants/generalConstants.js";
+import { orderServiceApiInstance } from "../api/apiInstances/apiInstance.js";
 import SharedResponses from "../shared/sharedResponses.js";
 import { HttpStatusCode } from "axios";
 
-const createOrderService = async (userId, cartItemIds) => {
+const getOrderByUserId = async (userId) => {
   try {
-    const response = await cartServiceApiInstance.post("/orders", null, {
-      params: { userId, cartItemIds },
+    const response = await orderServiceApiInstance.request({
+      url: `v1/api/orders/user/${userId}`,
+      method: generalConstants.HTTP_METHODS.GET,
     });
-    return response.data;
+
+    return response?.data;
   } catch (error) {
+    if (error.response?.status === 404) {
+      logger.warn(`Cart not found for user ${userId}`);
+      return null; // Return null instead of throwing an error
+    }
+    logger.error(`Error fetching cart for cart ${userId}: ${error}`);
     throw SharedResponses.ErrorResponse(
       HttpStatusCode.InternalServerError,
       error,
-      "Failed to create order"
+      "Failed to fetch cart"
     );
   }
 };
-
-const getOrderByIdService = async (orderId) => {
-  try {
-    const response = await cartServiceApiInstance.get(`/orders/${orderId}`);
-    return response.data;
-  } catch (error) {
-    throw SharedResponses.ErrorResponse(
-      HttpStatusCode.NotFound,
-      error,
-      "Order not found"
-    );
-  }
-};
-
-const getOrdersByUserIdService = async (userId) => {
-  try {
-    const response = await cartServiceApiInstance.get(`/orders/user/${userId}`);
-    return response.data;
-  } catch (error) {
-    throw SharedResponses.ErrorResponse(
-      HttpStatusCode.InternalServerError,
-      error,
-      "Failed to fetch orders for user"
-    );
-  }
-};
-
-const updateOrderService = async (orderId, orderDto) => {
-  try {
-    const response = await cartServiceApiInstance.put(
-      `/orders/${orderId}`,
-      orderDto
-    );
-    return response.data;
-  } catch (error) {
-    throw SharedResponses.ErrorResponse(
-      HttpStatusCode.BadRequest,
-      error,
-      "Failed to update order"
-    );
-  }
-};
-
-const deleteOrderService = async (orderId) => {
-  try {
-    await cartServiceApiInstance.delete(`/orders/${orderId}`);
-  } catch (error) {
-    throw SharedResponses.ErrorResponse(
-      HttpStatusCode.InternalServerError,
-      error,
-      "Failed to delete order"
-    );
-  }
-};
-
-const getAllOrdersService = async () => {
-  try {
-    const response = await cartServiceApiInstance.get("/orders");
-    return response.data;
-  } catch (error) {
-    throw SharedResponses.ErrorResponse(
-      HttpStatusCode.InternalServerError,
-      error,
-      "Failed to fetch all orders"
-    );
-  }
-};
-
 const orderService = {
-  getAllOrdersService,
-  deleteOrderService,
-  updateOrderService,
-  getOrdersByUserIdService,
-  getOrderByIdService,
-  createOrderService,
+  getOrderByUserId,
 };
 
 export default orderService;

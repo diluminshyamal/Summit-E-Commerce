@@ -1,16 +1,25 @@
 package com.example.order.service;
 
 import com.example.order.dto.OrderDto;
+import com.example.order.dto.OrderItemDto;
+
 import java.util.List;
 
 public interface OrderService {
-    OrderDto createOrder(OrderDto orderDto); // Now takes OrderDto directly
-    OrderDto getOrderById(Long orderId);
-    List<OrderDto> getOrdersByUserId(String userId);
-    OrderDto updateOrder(Long orderId, OrderDto orderDto);
-    void deleteOrder(Long orderId);
+
+    OrderDto createOrder(OrderDto orderDto);
+
+    OrderDto addItemToOrder(Long orderId, OrderItemDto orderItemDto);
+
+    OrderDto updateOrderItem(Long orderId, Long itemId, OrderItemDto orderItemDto);
+
+    OrderDto removeItemFromOrder(Long orderId, Long itemId);
+
+    void clearOrder(Long orderId);
+
     List<OrderDto> getAllOrders();
 
-    OrderDto createOrder(String userId, List<Long> cartItemIds);
-}
+    List<OrderDto> getOrdersByUserId(Long userId);
 
+    List<OrderItemDto> getAllItemsInOrder(Long orderId);
+}

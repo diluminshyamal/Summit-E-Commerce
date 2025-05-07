@@ -12,11 +12,12 @@ public class OrderItem {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private Long productId;
+
+    private Integer quantity;
+    private Double price;
+    private Double totalPrice;
     @ManyToOne
     @JoinColumn(name = "order_id")
     private Order order;
-
-    private Long productId;
-    private int quantity;
-    private BigDecimal price; // Price at the time of order
 }
